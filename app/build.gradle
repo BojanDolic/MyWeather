@@ -3,6 +3,10 @@ plugins {
     id 'kotlin-android'
 }
 
+def keyFile = rootProject.file("apiKey.properties")
+def keyProperties = new Properties()
+keyProperties.load(new FileInputStream(keyFile))
+
 android {
     compileSdk 31
 
@@ -14,6 +18,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "WEATHER_KEY", keyProperties["WEATHER_KEY"])
     }
 
     buildTypes {
@@ -29,6 +35,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
 }
 
 dependencies {
