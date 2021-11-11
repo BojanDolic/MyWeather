@@ -10,8 +10,11 @@ import android.view.ViewGroup
 import androidx.core.view.*
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import coil.load
 import com.electrocoder.myweather.R
+import com.electrocoder.myweather.constants.Constants
 import com.electrocoder.myweather.databinding.MainFragmentBinding
+import com.electrocoder.myweather.extensions.loadDynamicWeatherImage
 import com.electrocoder.myweather.models.ApiResponse
 import com.electrocoder.myweather.ui.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,7 +59,9 @@ class MainFragment : Fragment() {
         }
 
         binding.citySearchEdLayout.setEndIconOnClickListener {
-            viewModel.updateCityName(binding.citySearchEd.text.toString())
+
+            val cityName = binding.citySearchEd.text.toString()
+            viewModel.updateCityName(cityName)
         }
 
 
@@ -67,6 +72,9 @@ class MainFragment : Fragment() {
 
                 is ApiResponse.Success -> {
 
+
+                    binding.cityWeatherCard.isVisible = true
+
                     Log.d(TAG, "onViewCreated: USPJEŠNO PREUZIMANJE")
 
                     val weatherResponse = response.data
@@ -74,8 +82,16 @@ class MainFragment : Fragment() {
 
                         val weatherInfo = weather.weatherList[0]
 
+                        binding.weatherTemp.text = getString(R.string.temperature_text, weather.mainWeather.temp)
+
                         binding.cityName.text = weather.cityName
-                        binding.weatherTemp.text = String.format("%.1f", weather.mainWeather.temp)
+                        //binding.weatherTemp.text = String.format("%.1f", weather.mainWeather.temp)
+
+                        binding.weatherIcon.loadDynamicWeatherImage(
+                            weatherInfo.icon,
+                            Constants.IMAGE_TYPE.TYPE_LARGE)
+
+                        Log.d(TAG, "onViewCreated: ${weatherInfo.icon}")
                     }
 
 

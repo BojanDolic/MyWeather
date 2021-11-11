@@ -1,5 +1,6 @@
 package com.electrocoder.myweather.ui.viewmodels
 
+import android.text.TextUtils
 import android.util.Log
 import androidx.lifecycle.*
 import com.electrocoder.myweather.models.ApiResponse
@@ -23,31 +24,24 @@ class MainViewModel @Inject constructor(
     private val repository: Repository
 ) : ViewModel() {
 
-    private val cityName: MutableLiveData<String> = MutableLiveData("")
+    private var cityName: String = ""
 
     private val weatherForecastData = MutableLiveData<ApiResponse<WeatherResponse>>()
 
     val weatherForecast: LiveData<ApiResponse<WeatherResponse>> get() = weatherForecastData
 
 
-    val currentWeather = cityName.switchMap { cityName ->
-        liveData(context = viewModelScope.coroutineContext + Dispatchers.IO) {
-            val result = repository.getCurrentWeather(cityName).asLiveData()
-            emit(result)
-            Log.d(TAG, ": UPDATE PODATAKA")
-        }
-
-    }
-
-
     fun updateCityName(newCityName: String) {
-        weatherForecastData.value = ApiResponse.Loading()
+        if(!TextUtils.equals(cityName, newCityName)) {
 
-        Log.d(TAG, "updateCityName: POZVANA FUNKCIJA PROMJENE IMENA")
-        
-        viewModelScope.launch {
-            repository.getCurrentWeather(newCityName).collect {
-                weatherForecastData.value = it
+            cityName = newCityName
+
+            weatherForecastData.value = ApiResponse.Loading()
+
+            viewModelScope.launch {
+                repository.getCurrentWeather(newCityName).collect {
+                    weatherForecastData.value = it
+                }
             }
         }
     }
