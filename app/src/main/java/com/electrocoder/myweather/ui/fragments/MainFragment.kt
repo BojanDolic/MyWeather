@@ -8,14 +8,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.*
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.electrocoder.myweather.R
 import com.electrocoder.myweather.databinding.MainFragmentBinding
+import com.electrocoder.myweather.models.ApiResponse
 import com.electrocoder.myweather.ui.viewmodels.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+private const val TAG = "MainFragment"
+
+@AndroidEntryPoint
 class MainFragment : Fragment() {
 
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by viewModels<MainViewModel>()
 
     private var _binding: MainFragmentBinding? = null
     private val binding get() = _binding!!
@@ -39,25 +46,75 @@ class MainFragment : Fragment() {
 
         //WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.citySearchContainer) { _view, windowInsets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.searchContainer) { _view, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            // Apply the insets as a margin to the view. Here the system is setting
-            // only the bottom, left, and right dimensions, but apply whichever insets are
-            // appropriate to your layout. You can also update the view padding
-            // if that's more appropriate.
+
             _view.updateLayoutParams<ViewGroup.MarginLayoutParams>() {
                 topMargin = insets.top
-                Log.d("TAG", "onViewCreated: POZVAN INSET")
             }
-
-            /*_view.updatePadding(
-                bottom = insets.bottom
-            )*/
-
-            // Return CONSUMED if you don't want want the window insets to keep being
-            // passed down to descendant views.
             WindowInsetsCompat.CONSUMED
         }
+
+        binding.citySearchEdLayout.setEndIconOnClickListener {
+            viewModel.updateCityName(binding.citySearchEd.text.toString())
+        }
+
+
+
+        viewModel.weatherForecast.observe(viewLifecycleOwner) { response ->
+
+            when(response) {
+
+                is ApiResponse.Success -> {
+
+                    Log.d(TAG, "onViewCreated: USPJEŠNO PREUZIMANJE")
+
+                    val weatherResponse = response.data
+                    weatherResponse?.let { weather ->
+
+                        val weatherInfo = weather.weatherList[0]
+
+                        binding.cityName.text = weather.cityName
+                        binding.weatherTemp.text = String.format("%.1f", weather.mainWeather.temp)
+                    }
+
+
+
+                }
+
+                is ApiResponse.Error -> {
+                    Log.d(TAG, "onViewCreated: ERROR PREUZIMANJA ${response.message}")
+
+
+                }
+
+            }
+        }
+
+       /* viewModel.currentWeather?.observe(viewLifecycleOwner) { response ->
+
+            when(response) {
+
+                is ApiResponse.Success -> {
+
+                    Log.d(TAG, "onViewCreated: USPJEŠNO PREUZIMANJE")
+
+                    val weatherResponse = response.data
+                    weatherResponse?.let { weather ->
+
+                        val weatherInfo = weather.weatherList[0]
+
+                        binding.cityName.text = weather.cityName
+                        binding.weatherTemp.text = String.format("%.1f", weather.mainWeather.temp)
+                    }
+
+
+
+                }
+
+            }
+
+        }*/
 
     }
 

@@ -15,4 +15,7 @@ object Constants {
     val WEATHER_DRIZZLE = 300.399
     val WEATHER_THUNDERSTORM = 200.299
 
+
+    const val BASE_URL = "https://api.openweathermap.org/data/2.5/"
+
 }
