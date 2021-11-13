@@ -16,6 +16,7 @@ import com.electrocoder.myweather.constants.Constants
 import com.electrocoder.myweather.databinding.MainFragmentBinding
 import com.electrocoder.myweather.extensions.loadDynamicWeatherImage
 import com.electrocoder.myweather.models.ApiResponse
+import com.electrocoder.myweather.ui.adapters.FiveDayRecyclerAdapter
 import com.electrocoder.myweather.ui.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -29,6 +30,7 @@ class MainFragment : Fragment() {
 
     private var _binding: MainFragmentBinding? = null
     private val binding get() = _binding!!
+    private val adapter = FiveDayRecyclerAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,6 +47,14 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        /**
+         * Starting state of view
+         */
+        binding.errorContainer.isVisible = false
+        binding.weatherLoadingIndicator.isVisible = false
+        binding.cityWeatherCard.isVisible = false
+        binding.weatherInfoContainer.isVisible = false
 
 
         //WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
@@ -68,69 +78,94 @@ class MainFragment : Fragment() {
 
         viewModel.weatherForecast.observe(viewLifecycleOwner) { response ->
 
-            when(response) {
+            when (response) {
 
                 is ApiResponse.Success -> {
 
-
+                    binding.errorContainer.isVisible = false
+                    binding.weatherLoadingIndicator.isVisible = false
                     binding.cityWeatherCard.isVisible = true
-
-                    Log.d(TAG, "onViewCreated: USPJEŠNO PREUZIMANJE")
+                    binding.weatherInfoContainer.isVisible = true
 
                     val weatherResponse = response.data
                     weatherResponse?.let { weather ->
 
                         val weatherInfo = weather.weatherList[0]
 
-                        binding.weatherTemp.text = getString(R.string.temperature_text, weather.mainWeather.temp)
+                        binding.weatherTemp.text = getString(
+                            R.string.temperature_text,
+                            weather.mainWeather.temp
+                        )
 
                         binding.cityName.text = weather.cityName
-                        //binding.weatherTemp.text = String.format("%.1f", weather.mainWeather.temp)
+                        binding.weatherInfo.text = weatherInfo.main
+                        binding.weatherDescription.text = weatherInfo.description
+
+                        binding.weatherWindspeed.text = getString(
+                            R.string.wind_speed_text,
+                            weather.windInfo.windSpeed
+                        )
+
+                        binding.weatherPressure.text = getString(
+                            R.string.atmospheric_pressure_text,
+                            weather.mainWeather.pressure
+                        )
+
+                        binding.weatherHumidity.text = getString(
+                            R.string.humidity_text,
+                            weather.mainWeather.humidity
+                        )
 
                         binding.weatherIcon.loadDynamicWeatherImage(
                             weatherInfo.icon,
-                            Constants.IMAGE_TYPE.TYPE_LARGE)
+                            Constants.IMAGE_TYPE.TYPE_LARGE
+                        )
 
-                        Log.d(TAG, "onViewCreated: ${weatherInfo.icon}")
+
                     }
-
 
 
                 }
 
-                is ApiResponse.Error -> {
-                    Log.d(TAG, "onViewCreated: ERROR PREUZIMANJA ${response.message}")
+                is ApiResponse.Loading -> {
+                    binding.errorContainer.isVisible = false
+                    binding.cityWeatherCard.isVisible = true
+                    binding.weatherInfoContainer.isVisible = false
+                    binding.weatherLoadingIndicator.isVisible = true
+                }
 
+                is ApiResponse.Error -> {
+
+                    binding.weatherLoadingIndicator.isVisible = false
+                    binding.errorContainer.isVisible = true
+                    binding.errorDescription.text = response.message
 
                 }
 
             }
         }
 
-       /* viewModel.currentWeather?.observe(viewLifecycleOwner) { response ->
+        viewModel.fiveDayForecast.observe(viewLifecycleOwner) { response ->
 
-            when(response) {
+            when (response) {
 
                 is ApiResponse.Success -> {
 
-                    Log.d(TAG, "onViewCreated: USPJEŠNO PREUZIMANJE")
-
-                    val weatherResponse = response.data
-                    weatherResponse?.let { weather ->
-
-                        val weatherInfo = weather.weatherList[0]
-
-                        binding.cityName.text = weather.cityName
-                        binding.weatherTemp.text = String.format("%.1f", weather.mainWeather.temp)
+                    response.data?.let { fiveDayForecast ->
+                        adapter.submitList(fiveDayForecast.weatherList)
+                        binding.recyclerview.adapter = adapter
                     }
 
-
-
+                }
+                
+                is ApiResponse.Error -> {
+                    Log.d(TAG, "onViewCreated: ${response.message}")
                 }
 
             }
 
-        }*/
+        }
+
 
     }
 
