@@ -1,5 +1,6 @@
 package com.electrocoder.myweather.ui.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,8 @@ import com.electrocoder.myweather.constants.Constants
 import com.electrocoder.myweather.databinding.WeatherItemBinding
 import com.electrocoder.myweather.extensions.loadDynamicWeatherImage
 import com.electrocoder.myweather.models.WeatherResponse
+import java.text.SimpleDateFormat
+import java.util.*
 
 class FiveDayRecyclerAdapter : ListAdapter<WeatherResponse, FiveDayRecyclerAdapter.ViewHolder>(DiffUtilCallback()) {
 
@@ -41,11 +44,20 @@ class FiveDayRecyclerAdapter : ListAdapter<WeatherResponse, FiveDayRecyclerAdapt
                     Constants.IMAGE_TYPE.TYPE_SMALL
                 )
 
+                binding.weatherItemDescription.text = weatherResponse.weatherList[0].main
+
                 binding.weatherItemTemperature.text =
                     binding.weatherItemTemperature.context.getString(
                         R.string.temperature_text,
                         weatherResponse.mainWeather.temp
                     )
+
+                Log.d("TAG", "bindView: VRIJEME UNIX: ${weatherResponse.time}")
+
+                val date = Date(weatherResponse.time*1000L)
+                val simpleDateFormat = SimpleDateFormat("dd/MM - k:mm", Locale.getDefault())
+
+                binding.weatherItemDate.text = simpleDateFormat.format(date)
 
             }
 
