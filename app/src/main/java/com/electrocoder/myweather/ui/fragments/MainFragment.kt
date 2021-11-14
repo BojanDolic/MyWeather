@@ -57,8 +57,6 @@ class MainFragment : Fragment() {
         binding.weatherInfoContainer.isVisible = false
 
 
-        //WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
-
         ViewCompat.setOnApplyWindowInsetsListener(binding.searchContainer) { _view, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
 
@@ -165,7 +163,6 @@ class MainFragment : Fragment() {
             }
 
         }
-
 
     }
 

@@ -6,4 +6,6 @@
     <string name="wind_speed_text">%1$.1f m/s</string>
     <string name="atmospheric_pressure_text">%1$d hPa</string>
     <string name="humidity_text">%1$d %%</string>
+
+
 </resources>
