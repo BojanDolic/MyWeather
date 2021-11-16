@@ -48,9 +48,7 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        /**
-         * Starting state of view
-         */
+        // Starting state of the views
         binding.errorContainer.isVisible = false
         binding.weatherLoadingIndicator.isVisible = false
         binding.cityWeatherCard.isVisible = false
