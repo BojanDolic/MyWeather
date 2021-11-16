@@ -15,6 +15,12 @@ class Repository @Inject constructor(
 ) : ApiFetcher() {
 
 
+    /**
+     * Function used to retrieve data about current weather in given city
+     * @param city the city for which the weather data will be retrieved
+     *
+     * @return returns flow of API response
+     */
     suspend fun getCurrentWeather(city: String): Flow<ApiResponse<WeatherResponse>> {
         return flow {
             emit(fetchData {
@@ -26,7 +32,12 @@ class Repository @Inject constructor(
         }
     }
 
-
+    /**
+     * Function used to retrieve data about 5 day / 3 hour weather in given city
+     * @param city the city for which the weather data will be retrieved
+     *
+     * @return returns flow of API response
+     */
     suspend fun getFiveDayForecast(city: String): Flow<ApiResponse<DayForecast>> {
         return flow {
             emit(fetchData { api.getFiveDayForecast(
