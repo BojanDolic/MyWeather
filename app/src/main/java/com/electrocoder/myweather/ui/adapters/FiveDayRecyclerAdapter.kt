@@ -52,7 +52,6 @@ class FiveDayRecyclerAdapter : ListAdapter<WeatherResponse, FiveDayRecyclerAdapt
                         weatherResponse.mainWeather.temp
                     )
 
-                Log.d("TAG", "bindView: VRIJEME UNIX: ${weatherResponse.time}")
 
                 val date = Date(weatherResponse.time*1000L)
                 val simpleDateFormat = SimpleDateFormat("dd/MM - k:mm", Locale.getDefault())

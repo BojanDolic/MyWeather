@@ -7,7 +7,7 @@ import com.electrocoder.myweather.constants.Constants
 
 
 /**
- * Extension function used to load different image sizes based on @param imageSize parameter
+ * Extension function used to load different image sizes based on imageSize parameter
  * using Coil library
  *
  * @param icon icon name retrieved from api
@@ -21,11 +21,9 @@ fun ImageView.loadDynamicWeatherImage(
 
         Constants.IMAGE_TYPE.TYPE_LARGE -> {
             this.load(Constants.IMAGE_URL + icon + "@4x.png")
-            Log.d("TAG", Constants.IMAGE_URL + icon + "@4x.png")
         }
         Constants.IMAGE_TYPE.TYPE_SMALL -> {
             this.load(Constants.IMAGE_URL + icon + "@2x.png")
-            Log.d("TAG", Constants.IMAGE_URL + icon + "@4x.png")
         }
 
 
