@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
@@ -22,34 +23,25 @@ private const val TAG = "MainViewModel"
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val repository: Repository
+    private val repository: Repository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private var cityName: String = ""
+    val currentWeatherForecast =
+        savedStateHandle.getLiveData<String>("cityName").switchMap { query ->
+            repository.getCurrentWeather(query).asLiveData()
+        }
 
-    private val weatherForecastData = MutableLiveData<ApiResponse<WeatherResponse>>()
-    private val fiveDayForecastData = MutableLiveData<ApiResponse<DayForecast>>()
+    val fiveDayForecast =
+        savedStateHandle.getLiveData<String>("cityName").switchMap { query ->
+            repository.getFiveDayForecast(query).asLiveData()
+        }
 
-    val weatherForecast: LiveData<ApiResponse<WeatherResponse>> get() = weatherForecastData
-    val fiveDayForecast: LiveData<ApiResponse<DayForecast>> get() = fiveDayForecastData
 
     fun updateCityName(newCityName: String) {
-        if(!TextUtils.equals(cityName, newCityName)) {
-
-            cityName = newCityName
-
-            weatherForecastData.value = ApiResponse.Loading()
-
-            viewModelScope.launch {
-                repository.getCurrentWeather(newCityName).collect {
-                    weatherForecastData.value = it
-                }
-
-                repository.getFiveDayForecast(newCityName).collect {
-                    fiveDayForecastData.value = it
-                }
-            }
-        }
+        savedStateHandle["cityName"] = newCityName
     }
+
+    fun getCityName(): String = savedStateHandle.get("cityName") ?: ""
 
 }

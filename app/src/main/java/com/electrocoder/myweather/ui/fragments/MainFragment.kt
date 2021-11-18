@@ -1,14 +1,18 @@
 package com.electrocoder.myweather.ui.fragments
 
+import android.content.res.Configuration
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.OrientationEventListener
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.*
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import coil.load
 import com.electrocoder.myweather.R
@@ -26,7 +30,7 @@ private const val TAG = "MainFragment"
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
-    private val viewModel: MainViewModel by viewModels<MainViewModel>()
+    private val viewModel: MainViewModel by activityViewModels<MainViewModel>()
 
     private var _binding: MainFragmentBinding? = null
     private val binding get() = _binding!!
@@ -54,25 +58,38 @@ class MainFragment : Fragment() {
         binding.cityWeatherCard.isVisible = false
         binding.weatherInfoContainer.isVisible = false
 
+        if(viewModel.getCityName().isNotEmpty()) {
+            binding.citySearchEd.setText(viewModel.getCityName())
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.searchContainer) { _view, windowInsets ->
+            // Preventing keyboard from popping up when text is restored from process death
+            binding.citySearchEd.clearFocus()
+            binding.citySearchContainer.requestFocus()
+        }
+
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.constraintContainer) {
+                _view, windowInsets ->
+
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
 
-            _view.updateLayoutParams<ViewGroup.MarginLayoutParams>() {
-                topMargin = insets.top
-            }
-            WindowInsetsCompat.CONSUMED
+                _view.updateLayoutParams<ViewGroup.MarginLayoutParams>() {
+                    topMargin = insets.top
+                    rightMargin = insets.right
+                    leftMargin = insets.left
+                    bottomMargin = insets.bottom
+                }
+
+            windowInsets
         }
 
         binding.citySearchEdLayout.setEndIconOnClickListener {
-
             val cityName = binding.citySearchEd.text.toString()
             viewModel.updateCityName(cityName)
         }
 
 
 
-        viewModel.weatherForecast.observe(viewLifecycleOwner) { response ->
+        viewModel.currentWeatherForecast.observe(viewLifecycleOwner) { response ->
 
             when (response) {
 

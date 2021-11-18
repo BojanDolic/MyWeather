@@ -8,6 +8,7 @@
     tools:context=".ui.fragments.MainFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -29,7 +30,9 @@
                 android:id="@+id/city_search_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:focusable="true"
+                android:focusableInTouchMode="true">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/city_search_ed_layout"
@@ -125,7 +128,7 @@
                     android:fontFamily="@font/lato_black"
                     android:maxLines="1"
                     android:text="24 C"
-                    android:textSize="60sp"
+                    android:textSize="56sp"
                     app:layout_constraintBottom_toBottomOf="@id/weather_description"
                     app:layout_constraintEnd_toStartOf="@id/weather_icon"
                     app:layout_constraintStart_toStartOf="parent"

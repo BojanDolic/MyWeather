@@ -21,8 +21,9 @@ class Repository @Inject constructor(
      *
      * @return returns flow of API response
      */
-    suspend fun getCurrentWeather(city: String): Flow<ApiResponse<WeatherResponse>> {
+    fun getCurrentWeather(city: String): Flow<ApiResponse<WeatherResponse>> {
         return flow {
+            emit(ApiResponse.Loading())
             emit(fetchData {
                 api.getCurrentWeather(
                     city,
@@ -38,7 +39,7 @@ class Repository @Inject constructor(
      *
      * @return returns flow of API response
      */
-    suspend fun getFiveDayForecast(city: String): Flow<ApiResponse<DayForecast>> {
+    fun getFiveDayForecast(city: String): Flow<ApiResponse<DayForecast>> {
         return flow {
             emit(fetchData { api.getFiveDayForecast(
                 city,
